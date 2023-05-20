@@ -1,4 +1,5 @@
 import text_fields as tf
+from classes import Contact, Book
 
 
 def main_menu() -> int:
@@ -15,30 +16,31 @@ def input_choice():
         #     print(tf.wrong_choice)
 
 
-def show_contacts(contacts: list[dict[str]], message: str):
+def show_contacts(contacts: list[Contact], message: str):
     if contacts:
-        print("\n" + "=" * 72)
-        # for i, contact in enumerate(contacts, 1):
-        #     print(f"{i:<3} | {contact[0]:<20} | {contact[1]:<20} | {contact[2]:<20}")
+        print("\n" + "=" * 83)
         for contact in contacts:
-            print(f"{contact[0]:<3} | {contact[1]:<20} | {contact[2]:<20} | {contact[3]:<20}")
+            print(contact, f"Книга: {contact.book_id:<2}", sep=" | ")
 
-        print("=" * 72 + "\n")
+        print("=" * 83 + "\n")
     else:
-        print_message(tf.no_contacts)
+        print_message(message)
+
+
+def show_book_contacts(book: Book):
+    print("\n" + "=" * 72)
+    str_book = str(book)
+    if str_book != "":
+        print(book)
+    else:
+        print(tf.no_contacts)
+    print("=" * 72 + "\n")
 
 
 def print_message(message: str):
     print("\n" + "=" * len(message))
     print(message)
     print("=" * len(message) + "\n")
-
-
-# def input_contact(message: list) -> dict[str, str]:
-#     name = input(message[0])
-#     phone = input(message[1])
-#     comment = input(message[2])
-#     return {"name": name, "phone": phone, "comment": comment}
 
 
 def show_books(books: list):
@@ -51,11 +53,13 @@ def show_books(books: list):
         print("=" * 72 + "\n")
 
 
-def select_book():
+def select_book(books_ids):
     while True:
         num = input(tf.select_book)
-        if num.isdigit():  # and 0 < int(num) <= count:
+        if num.isdigit() and int(num) in books_ids:
             return int(num)
+        elif num == "":
+            return None
 
 
 def create_book():
@@ -71,8 +75,14 @@ def input_contact():
     return name, phone, comment
 
 
-def select_contact():
+def select_contact(contacts_ids):
     while True:
         num = input(tf.select_contact)
-        if num.isdigit():  # and 0 < int(num) <= count:
+        if num.isdigit() and int(num) in contacts_ids:
             return int(num)
+        elif num == "":
+            return None
+
+
+def input_pattern():
+    return input(tf.input_pattern)

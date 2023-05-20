@@ -1,5 +1,6 @@
 import sqlite3
 
+
 class ClassDB:
     def __init__(self, db_path: str = "Database/book.db"):
         self.db_path = db_path
@@ -50,16 +51,16 @@ class ClassDB:
         query = """DELETE FROM books WHERE book_id=?"""
         self.execute(query, (id,), commit=True)
 
-    def db_get_book_info(self, id: int):
+    def db_get_book_info(self, id: int) -> list[tuple]:
         query = """SELECT name, comment FROM books WHERE book_id=?"""
         return self.execute(query, (id,), fetchone=True)
 
-    def get_contact(self, contact_id: int):
+    def get_contact(self, contact_id: int) -> tuple:
         query = """SELECT name, phone, comment FROM contacts WHERE contact_id=?"""
         return self.execute(query, (contact_id,), fetchone=True)
 
-    def get_contact_list(self, id: int):
-        query = """SELECT contact_id, name, phone, comment FROM contacts WHERE book_id=?"""
+    def get_contact_list(self, id: int) -> list[tuple]:
+        query = """SELECT book_id, contact_id, name, phone, comment FROM contacts WHERE book_id=?"""
         return self.execute(query, (id,), fetchall=True)
 
     def create_contact(self, name: str, phone: str, comment: str, book_id: int):
@@ -74,8 +75,9 @@ class ClassDB:
         query = """UPDATE contacts SET name=?, phone=?, comment=? WHERE contact_id=?"""
         self.execute(query, (name, phone, comment, contact.id), commit=True)
 
-
-db = ClassDB()
+    def get_like(self, pattern) -> list[tuple]:
+        query = """SELECT book_id, contact_id, name, phone, comment FROM contacts WHERE name LIKE ?"""
+        return self.execute(query, ('%'+pattern+'%',), fetchall=True)
 
 
 def create_tables(db_: ClassDB):
