@@ -26,7 +26,7 @@ def create_equation(eq: dict[int, int]) -> str:
 
 def str_to_dict(eq: str) -> dict[int, int]:
     dict_1 = {}
-    monomials = split(" [+,-] ", eq.replace(" = 0", ""))
+    monomials = split(" [+-] ", eq.replace(" = 0", ""))
     for item in monomials:
         data = item.replace("*", "").split("x")
 
