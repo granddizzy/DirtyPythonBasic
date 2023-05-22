@@ -37,47 +37,56 @@ class ClassDB:
     def disconnect(self):
         self.connection.close()
 
-    def db_get_book_list(self):
-        query = """SELECT * FROM books"""
-        return self.execute(query, fetchall=True)
+    def get_data(self, table: str, fields: tuple, conditions=None, fetchall: bool = False, like: bool = False,
+                 or_and: str = "AND"):
+        if conditions is not None:
+            sign = " LIKE " if like else "="
+            query_conditions = f"WHERE {f' {or_and} '.join(f'{key}{sign}?' for key in conditions.keys())}"
+        else:
+            query_conditions = ""
 
-    def db_create_book(self, name: str, comment: str):
-        query = """INSERT INTO books(name, comment) VALUES (?, ?)"""
-        self.execute(query, (name, comment), commit=True)
+        query = f"""SELECT {', '.join(fields) if len(fields) > 1 else fields[0]} FROM {table} {query_conditions}"""
 
-    def db_delete_book(self, id: int):
-        query = """DELETE FROM contacts WHERE book_id=?"""
-        self.execute(query, (id,), commit=True)
-        query = """DELETE FROM books WHERE book_id=?"""
-        self.execute(query, (id,), commit=True)
+        if conditions is None:
+            parameters = ()
+        else:
+            parameters = tuple(conditions.values())
 
-    def db_get_book_info(self, id: int) -> list[tuple]:
-        query = """SELECT name, comment FROM books WHERE book_id=?"""
-        return self.execute(query, (id,), fetchone=True)
+        return self.execute(query, parameters, fetchall=fetchall, fetchone=not fetchall)
 
-    def get_contact(self, contact_id: int) -> tuple:
-        query = """SELECT name, phone, comment FROM contacts WHERE contact_id=?"""
-        return self.execute(query, (contact_id,), fetchone=True)
+    def delete_data(self, table: str, conditions=None, or_and: str = "AND"):
+        if conditions is not None:
+            query_conditions = f"WHERE {f' {or_and} '.join(f'{key}=?' for key in conditions.keys())}"
+        else:
+            query_conditions = ""
 
-    def get_contact_list(self, id: int) -> list[tuple]:
-        query = """SELECT book_id, contact_id, name, phone, comment FROM contacts WHERE book_id=?"""
-        return self.execute(query, (id,), fetchall=True)
+        query = f"""DELETE FROM {table} {query_conditions}"""
 
-    def create_contact(self, name: str, phone: str, comment: str, book_id: int):
-        query = """INSERT INTO contacts (book_id, name, phone, comment) VALUES (?, ?, ?, ?)"""
-        self.execute(query, (book_id, name, phone, comment), commit=True)
+        if conditions is None:
+            parameters = ()
+        else:
+            parameters = tuple(conditions.values())
 
-    def delete_contact(self, contact_id: int):
-        query = """DELETE FROM contacts WHERE contact_id=?"""
-        self.execute(query, (contact_id,), commit=True)
+        return self.execute(query, parameters, commit=True)
 
-    def change_contact(self, contact, name, phone, comment):
-        query = """UPDATE contacts SET name=?, phone=?, comment=? WHERE contact_id=?"""
-        self.execute(query, (name, phone, comment, contact.id), commit=True)
+    def update_data(self, table: str, fields: dict, conditions=None, or_and: str = "AND"):
+        if conditions is not None:
+            query_conditions = f"WHERE {f' {or_and} '.join(f'{key}=?' for key in conditions.keys())}"
+        else:
+            query_conditions = ""
 
-    def get_like(self, pattern) -> list[tuple]:
-        query = """SELECT book_id, contact_id, name, phone, comment FROM contacts WHERE name LIKE ?"""
-        return self.execute(query, ('%'+pattern+'%',), fetchall=True)
+        query = f"""UPDATE {table} SET {', '.join(map(lambda x: x + '=?', fields.keys())) if len(fields) > 1 else fields[0] + '=?'} {query_conditions}"""
+
+        if conditions is None:
+            parameters = ()
+        else:
+            parameters = tuple(fields.values()) + tuple(conditions.values())
+
+        return self.execute(query, parameters, commit=True)
+
+    def insert_data(self, table: str, fields: dict):
+        query = f"""INSERT INTO {table} ({', '.join(fields.keys()) if len(fields) > 1 else fields[0]}) VALUES ({', '.join(["?" for _ in fields.keys()])})"""
+        return self.execute(query, tuple(fields.values()), commit=True)
 
 
 def create_tables(db_: ClassDB):

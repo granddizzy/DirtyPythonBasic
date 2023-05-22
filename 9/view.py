@@ -10,7 +10,7 @@ def main_menu() -> int:
 def input_choice():
     while True:
         num = input(tf.input_choice)
-        if num.isdigit() and 0 < int(num) < 9:
+        if num.isdigit() and 0 < int(num) < 13:
             return int(num)
         # else:
         #     print(tf.wrong_choice)
@@ -62,7 +62,7 @@ def select_book(books_ids):
             return None
 
 
-def create_book():
+def input_book():
     name = input(tf.input_book_name)
     comment = input(tf.input_book_comment)
     return name, comment
@@ -86,3 +86,7 @@ def select_contact(contacts_ids):
 
 def input_pattern():
     return input(tf.input_pattern)
+
+
+def input_file():
+    return input(tf.input_file_path)
