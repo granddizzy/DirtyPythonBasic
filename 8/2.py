@@ -3,7 +3,7 @@ import os
 import json
 
 
-def load_class_journal() -> ():
+def load_class_journal() -> tuple:
     if mode == 1:
         file_path = "class_journal_json.db"
         if os.path.exists(file_path) and os.stat(file_path).st_size > 0:
@@ -66,7 +66,7 @@ def load_class_journal() -> ():
     return lessons_list_, students_list_, class_journal_
 
 
-def save_class_journal(class_journal_: dict):
+def save_class_journal(class_journal_: tuple):
     if mode == 1:
         with open("class_journal_json.db", "w", encoding="UTF-8") as file:
             file.write(
@@ -164,6 +164,8 @@ while True:
                 operation = 0
             else:
                 lesson = int(lesson)
+
+                print(f"\nИдет урок: {class_journal[0][lesson]}")
 
                 while True:
                     print()
