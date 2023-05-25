@@ -52,3 +52,5 @@ input_contact_comment = "Введите описание контакта: "
 input_pattern = "Введите данные для поиска: "
 
 input_file_path = "Введите путь к файлу: "
+
+error_book_load = "Ошибка загрузки книги из файла"
