@@ -1,5 +1,4 @@
 import text_fields as tf
-from classes import Contact, Book
 
 
 def main_menu() -> int:
@@ -12,25 +11,22 @@ def input_choice():
         num = input(tf.input_choice)
         if num.isdigit() and 0 < int(num) < 13:
             return int(num)
-        # else:
-        #     print(tf.wrong_choice)
 
 
-def show_contacts(contacts: list[Contact], message: str):
+def show_contacts(contacts: list[tuple], message: str):
     if contacts:
         print("\n" + "=" * 83)
         for contact in contacts:
-            print(contact, f"Книга: {contact.book_id:<2}", sep=" | ")
+            print(contact[0], f"Книга: {contact[1]:<2}", sep=" | ")
 
         print("=" * 83 + "\n")
     else:
         print_message(message)
 
 
-def show_book_contacts(book: Book):
+def show_book_contacts(book: str):
     print("\n" + "=" * 72)
-    str_book = str(book)
-    if str_book != "":
+    if book != "":
         print(book)
     else:
         print(tf.no_contacts)
@@ -63,14 +59,23 @@ def select_book(books_ids):
 
 
 def input_book():
-    name = input(tf.input_book_name)
+    while True:
+        if len(name := input(tf.input_book_name)) > 0:
+            break
+
     comment = input(tf.input_book_comment)
     return name, comment
 
 
 def input_contact():
-    name = input(tf.input_contact_name)
-    phone = input(tf.input_contact_phone)
+    while True:
+        if len(name := input(tf.input_contact_name)) > 0:
+            break
+
+    while True:
+        if len(phone := input(tf.input_contact_phone).replace(" ", "")) > 0 and phone.isdigit():
+            break
+
     comment = input(tf.input_contact_comment)
     return name, phone, comment
 

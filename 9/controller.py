@@ -52,33 +52,35 @@ def start():
             case 5:
                 # просмотр контактов
                 if curr_book_id >= 0:
-                    view.show_book_contacts(model.get_curr_book())
+                    view.show_book_contacts(str(model.get_curr_book()))
             case 6:
                 # найти контакт
-                view.show_contacts(model.find_contacts(view.input_pattern()), message=tf.no_find_contacts)
+                view.show_contacts(
+                    [(str(contact), contact.book_id) for contact in model.find_contacts(view.input_pattern())],
+                    message=tf.no_find_contacts)
             case 7:
                 # добавить контакт
                 if curr_book_id >= 0:
                     model.add_contact(*view.input_contact())
-                    view.show_book_contacts(model.get_curr_book())
+                    view.show_book_contacts(str(model.get_curr_book()))
             case 8:
                 # изменить контакт
                 if curr_book_id >= 0:
-                    view.show_book_contacts(model.get_curr_book())
+                    view.show_book_contacts(str(model.get_curr_book()))
                     id = view.select_contact(model.get_contacts_ids())
                     if id is not None:
                         model.change_contact(id, *view.input_contact())
-                        view.show_book_contacts(model.get_curr_book())
+                        view.show_book_contacts(str(model.get_curr_book()))
             case 9:
                 # удалить контакт
                 if curr_book_id >= 0:
-                    view.show_book_contacts(model.get_curr_book())
+                    view.show_book_contacts(str(model.get_curr_book()))
                     id = view.select_contact(model.get_contacts_ids())
                     if id is not None:
                         name, _, _ = model.get_contact_info(id)
                         model.del_contact(id)
                         view.print_message(tf.sucessfull_delete_contact.replace("%name%", name))
-                        view.show_book_contacts(model.get_curr_book())
+                        view.show_book_contacts(str(model.get_curr_book()))
             case 10:
                 if curr_book_id >= 0:
                     path = view.input_file()
@@ -88,6 +90,7 @@ def start():
                 if curr_book_id >= 0:
                     path = view.input_file()
                     if path:
-                        model.load_book_from_file(path)
+                        if not model.load_book_from_file(path):
+                            view.print_message(tf.error_book_load)
             case _:
                 break
