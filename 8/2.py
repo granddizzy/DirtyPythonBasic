@@ -88,20 +88,22 @@ def add_student(class_journal_: (), student_: str):
 
 
 def show_lessons(class_journal_):
+    print("\nПредметы:")
     for k, v in class_journal_[0].items():
         print(k, v)
 
 
 def show_students(class_journal_):
+    print("\n1Ученики:")
     for k, v in class_journal_[1].items():
         print(k, v)
 
 
 def add_grade(class_journal_: (), student_: int, lesson_: int, grade_: int):
-    if not lesson_ in class_journal_[2]:
+    if lesson_ not in class_journal_[2]:
         class_journal_[2][lesson_] = {}
 
-    if not student_ in class_journal_[2][lesson_]:
+    if student_ not in class_journal_[2][lesson_]:
         class_journal_[2][lesson_][student_] = []
 
     class_journal_[2][lesson_][student_].append(grade_)
@@ -120,66 +122,61 @@ class_journal = load_class_journal()
 
 operation = 0
 while True:
-    print()
-    match operation:
-        case 0:  # режим выбора операции
-            print(
-                """Меню:
+    print(
+        """\nМеню:
 1 - Показать список предметов
 2 - Добавить предмет
 3 - Показать список учеников
 4 - Добавить ученика
 5 - Начать урок
 6 - Завершить работу\n""")
-            operation = input("Выберите режим: ")
+    operation = input("Выберите режим: ")
 
-            if len(operation) == 0:
-                operation = -1
-            else:
-                operation = int(operation)
+    if len(operation) > 0 and operation.isdigit():
+        operation = int(operation)
+
+    match operation:
         case 1:
             show_lessons(class_journal)
-            operation = 0
         case 2:
             show_lessons(class_journal)
             lesson = input("Введите название предмета: ")
-            operation = 0
             if len(lesson) > 0:
                 add_lesson(class_journal, lesson)
                 show_lessons(class_journal)
         case 3:
             show_students(class_journal)
-            operation = 0
         case 4:
             show_students(class_journal)
             student = input("Введите ФИО ученика: ")
-            operation = 0
             if len(student) > 0:
                 add_student(class_journal, student)
                 show_students(class_journal)
         case 5:
-            show_lessons(class_journal)
-            lesson = input("Выберите предмет (введите номер): ")
-            if len(lesson) == 0 or not lesson.isdigit():
-                operation = 0
-            else:
-                lesson = int(lesson)
+            while True:
+                show_lessons(class_journal)
+                lesson = input("\nВыберите предмет (введите номер предмета): ")
+                lessons = class_journal[0].keys()
+                if len(lesson) > 0 and lesson.isdigit() and int(lesson) in lessons:
+                    lesson = int(lesson)
+                    print(f"\nИдет урок: {class_journal[0][lesson]}")
 
-                print(f"\nИдет урок: {class_journal[0][lesson]}")
-
-                while True:
-                    print()
-                    show_lesson_journal(class_journal, lesson)
-                    student = input("К доске пойдет (введите номер): ")
-
-                    if len(student) == 0 or not student.isdigit():
-                        operation = 5
-                        break
-                    else:
-                        grade = input("Поставьте оценку ученику: ")
-
-                        if len(grade) > 0 and student.isdigit():
-                            add_grade(class_journal, int(student), lesson, int(grade))
-        case _:
+                    while True:
+                        show_lesson_journal(class_journal, lesson)
+                        student = input("\nК доске пойдет (введите номер ученика): ")
+                        students = class_journal[1].keys()
+                        if len(student) > 0 and student.isdigit() and int(student) in students:
+                            while True:
+                                grade = input("Поставьте оценку ученику: ")
+                                if len(grade) > 0 and grade.isdigit() and int(grade) > 0:
+                                    add_grade(class_journal, int(student), lesson, int(grade))
+                                    break
+                        elif len(student) == 0:
+                            break
+                else:
+                    break
+        case 6:
             save_class_journal(class_journal)
             break
+        case _:
+            pass

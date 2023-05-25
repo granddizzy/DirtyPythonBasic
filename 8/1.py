@@ -1,8 +1,6 @@
 # парсинг многочлена
-from builtins import print
 from random import randint as ri
 from re import split
-from typing import Dict
 
 
 def create_dict():
