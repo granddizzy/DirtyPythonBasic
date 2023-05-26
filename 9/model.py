@@ -3,7 +3,7 @@ from classes import Book, Contact
 import json
 
 db = ClassDB()
-curr_book: Book
+curr_book: Book | None = None
 
 
 def get_books_list() -> list[tuple]:
@@ -15,18 +15,16 @@ def get_books_ids() -> list:
 
 
 def add_contact(name, phone, comment):
-    global curr_book
-    curr_book.new_contact(Contact(curr_book.db, curr_book.id, 0, name, phone, comment))
+    cb = get_curr_book()
+    cb.new_contact(Contact(cb.db, cb.id, 0, name, phone, comment))
 
 
 def get_contact_list() -> list[Contact]:
-    global curr_book
-    return curr_book.get_contact_list()
+    return get_curr_book().get_contact_list()
 
 
 def del_contact(id: int):
-    global curr_book
-    curr_book.get_contact(id).del_contact()
+    get_curr_book().get_contact(id).del_contact()
 
 
 def create_book(name: str, comment: str):
@@ -56,8 +54,7 @@ def set_curr_book(id: int):
 
 
 def change_contact(id, name, phone, comment):
-    global curr_book
-    curr_book.get_contact(id).change_contact(name, phone, comment)
+    get_curr_book().get_contact(id).change_contact(name, phone, comment)
 
 
 def change_book(id, name, comment):
@@ -65,13 +62,12 @@ def change_book(id, name, comment):
 
 
 def get_contact_info(id: int) -> tuple:
-    global curr_book
-    contact = curr_book.get_contact(id)
+    contact = get_curr_book().get_contact(id)
     return contact.name, contact.phone, contact.comment
 
 
 def get_contacts_ids() -> list:
-    return curr_book.get_contacts_ids()
+    return get_curr_book().get_contacts_ids()
 
 
 def find_contacts(pattern) -> list[Contact]:
@@ -89,9 +85,10 @@ def save_book_in_file(path):
 def load_book_from_file(path) -> bool:
     with open(path, "r", encoding="UTF-8") as file:
         clean_book()
+        cb = get_curr_book()
         try:
             for i in json.load(file):
-                curr_book.new_contact(Contact(db, curr_book.id, i["id"], i["name"], i["phone"], i["comment"]))
+                cb.new_contact(Contact(db, cb.id, i["id"], i["name"], i["phone"], i["comment"]))
         except:
             return False
 

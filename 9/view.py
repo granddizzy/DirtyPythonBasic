@@ -6,11 +6,13 @@ def main_menu() -> int:
     return input_choice()
 
 
-def input_choice():
+def input_choice() -> int | None:
     while True:
         num = input(tf.input_choice)
         if num.isdigit() and 0 < int(num) < 13:
             return int(num)
+        elif num == "":
+            return None
 
 
 def show_contacts(contacts: list[tuple], message: str):
