@@ -26,10 +26,11 @@ def show_contacts(contacts: list[tuple], message: str):
         print_message(message)
 
 
-def show_book_contacts(book: str):
+def show_book_contacts(contacts: list):
     print("\n" + "=" * 72)
-    if book != "":
-        print(book)
+    if len(contacts) > 0:
+        for contact in contacts:
+            print(contact)
     else:
         print(tf.no_contacts)
     print("=" * 72 + "\n")
@@ -47,7 +48,7 @@ def show_books(books: list):
     else:
         print("\n" + "=" * 72)
         for book in books:
-            print(f"{book[0]:<3} | {book[1]:<20} | {book[2]:<20}")
+            print(book)
         print("=" * 72 + "\n")
 
 

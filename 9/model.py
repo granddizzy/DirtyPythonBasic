@@ -6,17 +6,17 @@ db = ClassDB()
 curr_book: Book | None = None
 
 
-def get_books_list() -> list[tuple]:
-    return db.get_data("books", ("*",), fetchall=True)
+def get_books_list() -> list[Book]:
+    return [Book(db, item[0], item[1], item[2]) for item in
+            db.get_data("books", ("book_id", "name", "comment"), fetchall=True)]
 
 
-def get_books_ids() -> list:
-    return [item[0] for item in db.get_data("books", ("*",), fetchall=True)]
+def get_books_ids() -> list[int]:
+    return [book.id for book in get_books_list()]
 
 
 def add_contact(name, phone, comment):
-    cb = get_curr_book()
-    cb.new_contact(Contact(cb.db, cb.id, 0, name, phone, comment))
+    get_curr_book().add_contact(name, phone, comment)
 
 
 def get_contact_list() -> list[Contact]:
@@ -27,17 +27,14 @@ def del_contact(id: int):
     get_curr_book().get_contact(id).del_contact()
 
 
+def get_book(book_id: int) -> Book:
+    book_data = db.get_data("books", ("name", "comment"), {"book_id": book_id})
+    if book_data:
+        return Book(db, book_id, book_data[0], book_data[1])
+
+
 def create_book(name: str, comment: str):
     db.insert_data("books", {"name": name, "comment": comment})
-
-
-def delete_book(id: int):
-    db.delete_data("contacts", {"book_id": id})
-    db.delete_data("books", {"book_id": id})
-
-
-def get_book_info(id: int):
-    return db.get_data("books", ("name", "comment"), {"book_id": id})
 
 
 def create_db_tables():
@@ -48,22 +45,12 @@ def get_curr_book() -> Book:
     return curr_book
 
 
-def set_curr_book(id: int):
+def set_curr_book(id: int | None):
     global curr_book
-    curr_book = Book(db, id)
-
-
-def change_contact(id, name, phone, comment):
-    get_curr_book().get_contact(id).change_contact(name, phone, comment)
-
-
-def change_book(id, name, comment):
-    Book(db, id).change_book(name, comment)
-
-
-def get_contact_info(id: int) -> tuple:
-    contact = get_curr_book().get_contact(id)
-    return contact.name, contact.phone, contact.comment
+    if id:
+        curr_book = get_book(id)
+    else:
+        curr_book = None
 
 
 def get_contacts_ids() -> list:
@@ -73,7 +60,8 @@ def get_contacts_ids() -> list:
 def find_contacts(pattern) -> list[Contact]:
     return [Contact(db, *item) for item in
             db.get_data("contacts", ("book_id", "contact_id", "name", "phone", "comment"),
-                        {"name": '%' + pattern + '%', "phone": '%' + pattern + '%', "comment": '%' + pattern + '%'},
+                        {"name": '%' + pattern + '%', "phone": '%' + pattern + '%',
+                         "comment": '%' + pattern + '%'},
                         fetchall=True, like=True, or_and="OR")]
 
 
@@ -84,17 +72,11 @@ def save_book_in_file(path):
 
 def load_book_from_file(path) -> bool:
     with open(path, "r", encoding="UTF-8") as file:
-        clean_book()
-        cb = get_curr_book()
+        get_curr_book().clear()
         try:
             for i in json.load(file):
-                cb.new_contact(Contact(db, cb.id, i["id"], i["name"], i["phone"], i["comment"]))
+                get_curr_book().add_contact(i["name"], i["phone"], i["comment"])
         except:
             return False
 
     return True
-
-
-def clean_book():
-    for contact in get_contact_list():
-        db.delete_data("contacts", {"contact_id": contact.id})
