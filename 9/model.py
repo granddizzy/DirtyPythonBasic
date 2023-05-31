@@ -11,22 +11,6 @@ def get_books_list() -> list[Book]:
             db.get_data("books", ("book_id", "name", "comment"), fetchall=True)]
 
 
-def get_books_ids() -> list[int]:
-    return [book.id for book in get_books_list()]
-
-
-def add_contact(name, phone, comment):
-    get_curr_book().add_contact(name, phone, comment)
-
-
-def get_contact_list() -> list[Contact]:
-    return get_curr_book().get_contact_list()
-
-
-def del_contact(id: int):
-    get_curr_book().get_contact(id).del_contact()
-
-
 def get_book(book_id: int) -> Book:
     book_data = db.get_data("books", ("name", "comment"), {"book_id": book_id})
     if book_data:
@@ -53,10 +37,6 @@ def set_curr_book(id: int | None):
         curr_book = None
 
 
-def get_contacts_ids() -> list:
-    return get_curr_book().get_contacts_ids()
-
-
 def find_contacts(pattern) -> list[Contact]:
     return [Contact(db, *item) for item in
             db.get_data("contacts", ("book_id", "contact_id", "name", "phone", "comment"),
@@ -67,7 +47,7 @@ def find_contacts(pattern) -> list[Contact]:
 
 def save_book_in_file(path):
     with open(path, "w", encoding="UTF-8") as file:
-        file.write(json.dumps(list(map(lambda x: x.get_dump(), get_contact_list()))))
+        file.write(json.dumps(list(map(lambda x: x.get_dump(), get_curr_book().get_contact_list()))))
 
 
 def load_book_from_file(path) -> bool:

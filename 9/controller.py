@@ -19,7 +19,7 @@ def start():
                 books = model.get_books_list()
                 view.show_books(list(map(str, books)))
                 if len(books) > 0:
-                    book_id = view.select_book(model.get_books_ids())
+                    book_id = view.select_book([book.id for book in model.get_books_list()])
                     if book_id:
                         model.set_curr_book(book_id)
             case 2:
@@ -55,26 +55,26 @@ def start():
             case 7:
                 # создать контакт
                 if model.get_curr_book():
-                    model.add_contact(*view.input_contact())
+                    model.get_curr_book().add_contact(*view.input_contact())
                     view.show_book_contacts([str(contact) for contact in model.get_curr_book().get_contact_list()])
             case 8:
                 # изменить контакт
                 if model.get_curr_book():
                     view.show_book_contacts([str(contact) for contact in model.get_curr_book().get_contact_list()])
-                    id = view.select_contact(model.get_contacts_ids())
+                    id = view.select_contact(model.get_curr_book().get_contacts_ids())
                     if id:
                         contact = model.get_curr_book().get_contact(id)
-                        contact.name , contact.phone, contact.comment = view.input_contact()
+                        contact.name, contact.phone, contact.comment = view.input_contact()
                         contact.update_db()
                         view.show_book_contacts([str(contact) for contact in model.get_curr_book().get_contact_list()])
             case 9:
                 # удалить контакт
                 if model.get_curr_book():
                     view.show_book_contacts([str(contact) for contact in model.get_curr_book().get_contact_list()])
-                    id = view.select_contact(model.get_contacts_ids())
+                    id = view.select_contact(model.get_curr_book().get_contacts_ids())
                     if id:
                         contact = model.get_curr_book().get_contact(id)
-                        model.del_contact(id)
+                        model.get_curr_book().get_contact(id).del_contact()
                         view.print_message(tf.sucessfull_delete_contact.replace("%name%", contact.name))
                         view.show_book_contacts([str(contact) for contact in model.get_curr_book().get_contact_list()])
             case 10:
